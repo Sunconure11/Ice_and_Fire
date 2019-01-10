@@ -27,22 +27,25 @@ public class WorldGenFireDragonRoosts extends WorldGenerator {
 			for (BlockPos blockpos : BlockPos.getAllInBox(position.add(-j, -k, -l), position.add(j, k, l))) {
 				if (blockpos.distanceSq(position) <= (double) (f * f)) {
 					IBlockState state = world.getBlockState(blockpos);
-					if (state.getMaterial() == Material.GRASS) {
-						world.setBlockState(blockpos, ModBlocks.charedGrass.getDefaultState());
-					} else if (state.getMaterial() == Material.GROUND && state.getBlock() == Blocks.DIRT) {
-						world.setBlockState(blockpos, ModBlocks.charedDirt.getDefaultState());
-					} else if (state.getMaterial() == Material.GROUND && state.getBlock() == Blocks.GRAVEL) {
-						world.setBlockState(blockpos, ModBlocks.charedGravel.getDefaultState());
-					} else if (state.getMaterial() == Material.ROCK && (state.getBlock() == Blocks.COBBLESTONE || state.getBlock().getUnlocalizedName().contains("cobblestone"))) {
-						world.setBlockState(blockpos, ModBlocks.charedCobblestone.getDefaultState());
-					} else if (state.getMaterial() == Material.ROCK) {
-						world.setBlockState(blockpos, ModBlocks.charedStone.getDefaultState());
-					} else if (state.getBlock() == Blocks.GRASS_PATH) {
-						world.setBlockState(blockpos, ModBlocks.charedGrassPath.getDefaultState());
-					} else if (state.getMaterial() == Material.WOOD) {
-						world.setBlockState(blockpos, ModBlocks.ash.getDefaultState());
-					} else if (state.getMaterial() == Material.LEAVES || state.getMaterial() == Material.PLANTS) {
-						world.setBlockState(blockpos, Blocks.AIR.getDefaultState());
+					float hardness = state.getBlock().getBlockHardness(state, world, blockpos);
+					if(hardness != -1.0F) {
+						if (state.getMaterial() == Material.GRASS) {
+							world.setBlockState(blockpos, ModBlocks.charedGrass.getDefaultState());
+						} else if (state.getMaterial() == Material.GROUND && state.getBlock() == Blocks.DIRT) {
+							world.setBlockState(blockpos, ModBlocks.charedDirt.getDefaultState());
+						} else if (state.getMaterial() == Material.GROUND && state.getBlock() == Blocks.GRAVEL) {
+							world.setBlockState(blockpos, ModBlocks.charedGravel.getDefaultState());
+						} else if (state.getMaterial() == Material.ROCK && (state.getBlock() == Blocks.COBBLESTONE || state.getBlock().getTranslationKey().contains("cobblestone"))) {
+							world.setBlockState(blockpos, ModBlocks.charedCobblestone.getDefaultState());
+						} else if (state.getMaterial() == Material.ROCK) {
+							world.setBlockState(blockpos, ModBlocks.charedStone.getDefaultState());
+						} else if (state.getBlock() == Blocks.GRASS_PATH) {
+							world.setBlockState(blockpos, ModBlocks.charedGrassPath.getDefaultState());
+						} else if (state.getMaterial() == Material.WOOD) {
+							world.setBlockState(blockpos, ModBlocks.ash.getDefaultState());
+						} else if (state.getMaterial() == Material.LEAVES || state.getMaterial() == Material.PLANTS) {
+							world.setBlockState(blockpos, Blocks.AIR.getDefaultState());
+						}
 					}
 				}
 			}
@@ -75,7 +78,7 @@ public class WorldGenFireDragonRoosts extends WorldGenerator {
 			int l = radius + rand.nextInt(2);
 			float f = (float) (j + k + l) * 0.333F + 0.5F;
 			for (BlockPos blockpos : BlockPos.getAllInBox(position.add(-j, -k, -l), position.add(j, k, l))) {
-				if (blockpos.distanceSq(position) <= (double) (f * f) && world.isAirBlock(blockpos) && world.getBlockState(blockpos.down()).getBlock().getUnlocalizedName().contains("chared")) {
+				if (blockpos.distanceSq(position) <= (double) (f * f) && world.isAirBlock(blockpos) && world.getBlockState(blockpos.down()).getBlock().getTranslationKey().contains("chared")) {
 					int chance = rand.nextInt(100);
 					if (chance < 4) {
 						int chance2 = rand.nextInt(20);

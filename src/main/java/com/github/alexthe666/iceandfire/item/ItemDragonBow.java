@@ -8,22 +8,24 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Enchantments;
-import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.item.*;
+import net.minecraft.item.EnumAction;
+import net.minecraft.item.IItemPropertyGetter;
+import net.minecraft.item.ItemBow;
+import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemDragonBow extends ItemBow {
+public class ItemDragonBow extends ItemBow implements ICustomRendered {
 
 	public ItemDragonBow() {
 		this.maxStackSize = 1;
 		this.setMaxDamage(584);
 		this.setCreativeTab(IceAndFire.TAB);
-		this.setUnlocalizedName("iceandfire.dragonbone_bow");
+		this.setTranslationKey("iceandfire.dragonbone_bow");
 		this.setRegistryName(IceAndFire.MODID, "dragonbone_bow");
 		this.addPropertyOverride(new ResourceLocation("pull"), new IItemPropertyGetter() {
 			@Override

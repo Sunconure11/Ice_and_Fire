@@ -11,13 +11,13 @@ import net.minecraft.stats.StatList;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 
-public class ItemDeathwormEgg extends Item {
+public class ItemDeathwormEgg extends Item implements  ICustomRendered{
 
     public ItemDeathwormEgg() {
         this.setCreativeTab(IceAndFire.TAB);
         this.setHasSubtypes(true);
         this.setMaxDamage(0);
-        this.setUnlocalizedName("deathworm_egg");
+        this.setTranslationKey("deathworm_egg");
         this.setRegistryName(IceAndFire.MODID, "iceandfire.deathworm_egg");
         this.maxStackSize = 1;
     }

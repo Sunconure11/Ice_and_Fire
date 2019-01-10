@@ -5,7 +5,6 @@ import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.EntityAITarget;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 
@@ -17,34 +16,25 @@ import java.util.List;
 public class MyrmexAIForageForItems<T extends EntityItem> extends EntityAITarget {
     protected final DragonAITargetItems.Sorter theNearestAttackableTargetSorter;
     protected final Predicate<? super EntityItem> targetEntitySelector;
-    private final int targetChance;
     protected EntityItem targetEntity;
     public EntityMyrmexWorker myrmex;
 
-    public MyrmexAIForageForItems(EntityMyrmexWorker myrmex, boolean checkSight) {
-        this(myrmex, checkSight, false);
-    }
-
-    public MyrmexAIForageForItems(EntityMyrmexWorker myrmex, boolean checkSight, boolean onlyNearby) {
-        this(myrmex, 20, checkSight, onlyNearby, (Predicate<? super EntityItem>) null);
-    }
-
-    public MyrmexAIForageForItems(EntityMyrmexWorker myrmex, int chance, boolean checkSight, boolean onlyNearby, @Nullable final Predicate<? super T> targetSelector) {
-        super(myrmex, checkSight, onlyNearby);
-        this.targetChance = chance;
+    public MyrmexAIForageForItems(EntityMyrmexWorker myrmex) {
+        super(myrmex, false, false);
         this.theNearestAttackableTargetSorter = new DragonAITargetItems.Sorter(myrmex);
         this.targetEntitySelector = new Predicate<EntityItem>() {
             @Override
             public boolean apply(@Nullable EntityItem item) {
-                return item instanceof EntityItem && !item.getItem().isEmpty();
+                return item instanceof EntityItem && !item.getItem().isEmpty() && !item.isInWater();
             }
         };
         this.myrmex = myrmex;
+        this.setMutexBits(1);
     }
 
     @Override
     public boolean shouldExecute() {
-        if (!this.myrmex.getNavigator().noPath() || !myrmex.canSeeSky() || this.myrmex.shouldEnterHive() || !this.myrmex.keepSearching) {
+        if (!this.myrmex.canMove() || this.myrmex.holdingBaby() || !this.myrmex.getNavigator().noPath() || this.myrmex.shouldEnterHive() || !this.myrmex.keepSearching || this.myrmex.getAttackTarget() != null) {
             return false;
         }
         List<EntityItem> list = this.taskOwner.world.<EntityItem>getEntitiesWithinAABB(EntityItem.class, this.getTargetableArea(this.getTargetDistance()), this.targetEntitySelector);
@@ -58,7 +48,7 @@ public class MyrmexAIForageForItems<T extends EntityItem> extends EntityAITarget
     }
 
     protected AxisAlignedBB getTargetableArea(double targetDistance) {
-        return this.taskOwner.getEntityBoundingBox().expand(targetDistance, 4.0D, targetDistance);
+        return this.taskOwner.getEntityBoundingBox().grow(targetDistance, 4.0D, targetDistance);
     }
 
     @Override
@@ -70,19 +60,20 @@ public class MyrmexAIForageForItems<T extends EntityItem> extends EntityAITarget
     @Override
     public void updateTask() {
         super.updateTask();
-        if (this.targetEntity == null || this.targetEntity != null && this.targetEntity.isDead) {
+        if (this.targetEntity == null || this.targetEntity != null && (this.targetEntity.isDead || this.targetEntity.isInWater())) {
             this.resetTask();
         }
         if (this.targetEntity != null && !this.targetEntity.isDead && this.taskOwner.getDistanceSq(this.targetEntity) < 1) {
-            this.myrmex.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(this.targetEntity.getItem().getItem(), 1, this.targetEntity.getItem().getItemDamage()));
-            this.targetEntity.getItem().shrink(1);
+            this.myrmex.onPickupItem(targetEntity);
+            this.myrmex.setHeldItem(EnumHand.MAIN_HAND, this.targetEntity.getItem());
+            this.targetEntity.setDead();
             resetTask();
         }
     }
 
     @Override
     public boolean shouldContinueExecuting() {
-        return !this.taskOwner.getNavigator().noPath();
+        return !this.taskOwner.getNavigator().noPath() && this.myrmex.getAttackTarget() == null;
     }
 
     public static class Sorter implements Comparator<Entity> {

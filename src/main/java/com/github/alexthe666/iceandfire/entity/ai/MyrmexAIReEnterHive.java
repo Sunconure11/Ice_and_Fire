@@ -21,10 +21,13 @@ public class MyrmexAIReEnterHive extends EntityAIBase {
     }
 
     public boolean shouldExecute() {
-        if(this.myrmex.shouldLeaveHive() || !this.myrmex.canSeeSky() || this.myrmex.isOnResin() || !first){
+        if(!this.myrmex.canMove() || this.myrmex.shouldLeaveHive() || !this.myrmex.canSeeSky() || !first){
             return false;
         }
-        MyrmexHive village = MyrmexWorldData.get(this.myrmex.world).getNearestVillage(new BlockPos(this.myrmex), 100);
+        MyrmexHive village = this.myrmex.getHive();
+        if (village == null) {
+            village = MyrmexWorldData.get(this.myrmex.world).getNearestHive(new BlockPos(this.myrmex), 500);
+        }
         if (village == null) {
             return false;
         } else {
@@ -40,7 +43,7 @@ public class MyrmexAIReEnterHive extends EntityAIBase {
         this.myrmex.getNavigator().setPath(this.path, this.movementSpeed);
 
         if(this.myrmex.getDistanceSq(nextEntrance) < 9 && first){
-            MyrmexHive village = MyrmexWorldData.get(this.myrmex.world).getNearestVillage(new BlockPos(this.myrmex), 100);
+            MyrmexHive village = MyrmexWorldData.get(this.myrmex.world).getNearestHive(new BlockPos(this.myrmex), 100);
             if(village != null){
                 nextEntrance = MyrmexHive.getGroundedPos(this.myrmex.world, village.getClosestEntranceBottomToEntity(this.myrmex, this.myrmex.getRNG()));
                 first = false;
@@ -48,15 +51,19 @@ public class MyrmexAIReEnterHive extends EntityAIBase {
                 this.path = this.myrmex.getNavigator().getPathToPos(nextEntrance);
                 this.myrmex.getNavigator().setPath(this.path, this.movementSpeed);
             }
-
+        }
+        if(this.myrmex.getDistanceSq(nextEntrance) < 5 && !first){
+            this.myrmex.isEnteringHive = false;
+        }else{
+            this.myrmex.isEnteringHive = true;
         }
     }
 
     public boolean shouldContinueExecuting() {
-        if(!myrmex.canSeeSky() && first || this.myrmex.getDistanceSq(nextEntrance) < 3 && !first){
+        if(this.myrmex.getDistanceSq(nextEntrance) < 3 && !first){
             return false;
         }
-        return !this.myrmex.getNavigator().noPath() && this.myrmex.shouldEnterHive();
+        return this.myrmex.shouldEnterHive();
     }
 
     public void resetTask() {

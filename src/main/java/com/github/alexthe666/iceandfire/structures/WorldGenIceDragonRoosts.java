@@ -27,22 +27,25 @@ public class WorldGenIceDragonRoosts extends WorldGenerator {
 			for (BlockPos blockpos : BlockPos.getAllInBox(position.add(-j, -k, -l), position.add(j, k, l))) {
 				if (blockpos.distanceSq(position) <= (double) (f * f)) {
 					IBlockState state = world.getBlockState(blockpos);
-					if (state.getMaterial() == Material.GRASS || state.getMaterial() == Material.CRAFTED_SNOW && world.canBlockSeeSky(blockpos)) {
-						world.setBlockState(blockpos, ModBlocks.frozenGrass.getDefaultState());
-					} else if (state.getMaterial() == Material.GROUND && state.getBlock() == Blocks.DIRT || state.getMaterial() == Material.CRAFTED_SNOW && !world.canBlockSeeSky(blockpos)) {
-						world.setBlockState(blockpos, ModBlocks.frozenDirt.getDefaultState());
-					} else if (state.getMaterial() == Material.GROUND && state.getBlock() == Blocks.GRAVEL) {
-						world.setBlockState(blockpos, ModBlocks.frozenGravel.getDefaultState());
-					} else if (state.getMaterial() == Material.ROCK && (state.getBlock() == Blocks.COBBLESTONE || state.getBlock().getUnlocalizedName().contains("cobblestone"))) {
-						world.setBlockState(blockpos, ModBlocks.frozenCobblestone.getDefaultState());
-					} else if (state.getMaterial() == Material.ROCK) {
-						world.setBlockState(blockpos, ModBlocks.frozenStone.getDefaultState());
-					} else if (state.getBlock() == Blocks.GRASS_PATH) {
-						world.setBlockState(blockpos, ModBlocks.frozenGrassPath.getDefaultState());
-					} else if (state.getMaterial() == Material.WOOD) {
-						world.setBlockState(blockpos, ModBlocks.frozenSplinters.getDefaultState());
-					} else if (state.getMaterial() == Material.LEAVES || state.getMaterial() == Material.PLANTS || state.getBlock() == Blocks.SNOW_LAYER) {
-						world.setBlockState(blockpos, Blocks.AIR.getDefaultState());
+					float hardness = state.getBlock().getBlockHardness(state, world, blockpos);
+					if(hardness != -1.0F) {
+						if (state.getMaterial() == Material.GRASS || state.getMaterial() == Material.CRAFTED_SNOW && world.canBlockSeeSky(blockpos)) {
+							world.setBlockState(blockpos, ModBlocks.frozenGrass.getDefaultState());
+						} else if (state.getMaterial() == Material.GROUND && state.getBlock() == Blocks.DIRT || state.getMaterial() == Material.CRAFTED_SNOW && !world.canBlockSeeSky(blockpos)) {
+							world.setBlockState(blockpos, ModBlocks.frozenDirt.getDefaultState());
+						} else if (state.getMaterial() == Material.GROUND && state.getBlock() == Blocks.GRAVEL) {
+							world.setBlockState(blockpos, ModBlocks.frozenGravel.getDefaultState());
+						} else if (state.getMaterial() == Material.ROCK && (state.getBlock() == Blocks.COBBLESTONE || state.getBlock().getTranslationKey().contains("cobblestone"))) {
+							world.setBlockState(blockpos, ModBlocks.frozenCobblestone.getDefaultState());
+						} else if (state.getMaterial() == Material.ROCK) {
+							world.setBlockState(blockpos, ModBlocks.frozenStone.getDefaultState());
+						} else if (state.getBlock() == Blocks.GRASS_PATH) {
+							world.setBlockState(blockpos, ModBlocks.frozenGrassPath.getDefaultState());
+						} else if (state.getMaterial() == Material.WOOD) {
+							world.setBlockState(blockpos, ModBlocks.frozenSplinters.getDefaultState());
+						} else if (state.getMaterial() == Material.LEAVES || state.getMaterial() == Material.PLANTS || state.getBlock() == Blocks.SNOW_LAYER) {
+							world.setBlockState(blockpos, Blocks.AIR.getDefaultState());
+						}
 					}
 				}
 			}
@@ -75,7 +78,7 @@ public class WorldGenIceDragonRoosts extends WorldGenerator {
 			int l = radius + rand.nextInt(2);
 			float f = (float) (j + k + l) * 0.333F + 0.5F;
 			for (BlockPos blockpos : BlockPos.getAllInBox(position.add(-j, -k, -l), position.add(j, k, l))) {
-				if (blockpos.distanceSq(position) <= (double) (f * f) && world.isAirBlock(blockpos) && world.getBlockState(blockpos.down()).getBlock().getUnlocalizedName().contains("frozen")) {
+				if (blockpos.distanceSq(position) <= (double) (f * f) && world.isAirBlock(blockpos) && world.getBlockState(blockpos.down()).getBlock().getTranslationKey().contains("frozen")) {
 					int chance = rand.nextInt(100);
 					if (chance < 4) {
 						int chance2 = rand.nextInt(20);

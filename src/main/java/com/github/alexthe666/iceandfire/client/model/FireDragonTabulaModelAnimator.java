@@ -88,7 +88,7 @@ public class FireDragonTabulaModelAnimator implements IIceAndFireTabulaModelAnim
                 }
             }
             if(entity.fireBreathProgress > 0.0F){
-                if(!isPartEqual(cube, EnumDragonAnimations.STREAM_BREATH.firedragon_model.getCube(cube.boxName)) && !isWing(model, cube)){
+                if(!isPartEqual(cube, EnumDragonAnimations.STREAM_BREATH.firedragon_model.getCube(cube.boxName)) && !isWing(model, cube) && !cube.boxName.contains("Finger")){
                     transitionTo(cube, EnumDragonAnimations.STREAM_BREATH.firedragon_model.getCube(cube.boxName), entity.fireBreathProgress, 5, false);
                 }
             }
@@ -145,7 +145,7 @@ public class FireDragonTabulaModelAnimator implements IIceAndFireTabulaModelAnim
             model.bob(model.getCube("ThighL"), speed_idle, -degree_idle * 1.3F, false, entity.ticksExisted, 1);
             model.bob(model.getCube("ArmR1"), speed_idle, -degree_idle * 1.3F, false, entity.ticksExisted, 1);
             model.bob(model.getCube("ArmL1"), speed_idle, -degree_idle * 1.3F, false, entity.ticksExisted, 1);
-            if(entity.getAnimation() != EntityDragonBase.ANIMATION_SHAKEPREY){
+            if(entity.getAnimation() != EntityDragonBase.ANIMATION_SHAKEPREY || entity.getAnimation() != EntityDragonBase.ANIMATION_ROAR){
                 model.faceTarget(rotationYaw, rotationPitch, 4, neckParts);
             }
         }

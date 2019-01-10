@@ -23,11 +23,11 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
-public class ItemHippogryphEgg extends Item {
+public class ItemHippogryphEgg extends Item implements ICustomRendered{
 
 	public ItemHippogryphEgg() {
 		this.setCreativeTab(IceAndFire.TAB);
-		this.setUnlocalizedName("iceandfire.hippogryph_egg");
+		this.setTranslationKey("iceandfire.hippogryph_egg");
 		this.setRegistryName(IceAndFire.MODID, "hippogryph_egg");
 		this.setHasSubtypes(true);
 	}

@@ -5,6 +5,7 @@ import com.github.alexthe666.iceandfire.core.ModBlocks;
 import com.github.alexthe666.iceandfire.core.ModItems;
 import com.github.alexthe666.iceandfire.core.ModSounds;
 import com.github.alexthe666.iceandfire.entity.tile.TileEntityJar;
+import com.github.alexthe666.iceandfire.item.ICustomRendered;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
@@ -29,7 +30,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Random;
 
-public class BlockJar extends BlockContainer {
+public class BlockJar extends BlockContainer implements ICustomRendered {
 	private static AxisAlignedBB AABB = new AxisAlignedBB(0.1875F, 0, 0.1875F, 0.8125F, 1F, 0.8125F);
 	public Item itemBlock;
 	private boolean empty;
@@ -40,7 +41,7 @@ public class BlockJar extends BlockContainer {
 		this.setResistance(2.0F);
 		this.setSoundType(SoundType.GLASS);
 		this.setCreativeTab(IceAndFire.TAB);
-		this.setUnlocalizedName("iceandfire.jar" + (empty ? "_empty" : "_pixie"));
+		this.setTranslationKey("iceandfire.jar" + (empty ? "_empty" : "_pixie"));
 		this.setRegistryName(IceAndFire.MODID, "jar" + (empty ? "_empty" : "_pixie"));
 		if(!empty){
 			this.setLightLevel(0.75F);
@@ -107,6 +108,10 @@ public class BlockJar extends BlockContainer {
 		return Item.getItemFromBlock(ModBlocks.jar_empty);
 	}
 
+	protected ItemStack getSilkTouchDrop(IBlockState state){
+		return new ItemStack(ModBlocks.jar_empty);
+	}
+
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if (!empty && world.getTileEntity(pos) != null && world.getTileEntity(pos) instanceof TileEntityJar && ((TileEntityJar) world.getTileEntity(pos)).hasPixie && ((TileEntityJar) world.getTileEntity(pos)).hasProduced) {
 			((TileEntityJar) world.getTileEntity(pos)).hasProduced = false;
@@ -123,7 +128,7 @@ public class BlockJar extends BlockContainer {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public BlockRenderLayer getBlockLayer() {
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.TRANSLUCENT;
 	}
 

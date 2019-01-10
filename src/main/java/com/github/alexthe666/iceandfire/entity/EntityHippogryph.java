@@ -51,7 +51,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
-public class EntityHippogryph extends EntityTameable implements IAnimatedEntity, IDragonFlute, IVillagerFear, IAnimalFear {
+public class EntityHippogryph extends EntityTameable implements IAnimatedEntity, IDragonFlute, IVillagerFear, IAnimalFear, IDropArmor {
 
 	public static final ResourceLocation LOOT = LootTableList.register(new ResourceLocation("iceandfire", "hippogryph"));
 	private static final int FLIGHT_CHANCE_PER_TICK = 1200;
@@ -98,6 +98,10 @@ public class EntityHippogryph extends EntityTameable implements IAnimatedEntity,
 		}
 		this.setSize(1.7F, 1.6F);
 		this.stepHeight = 1;
+	}
+
+	protected int getExperiencePoints(EntityPlayer player) {
+		return 7 + this.world.rand.nextInt(10);
 	}
 
 	@Override
@@ -265,7 +269,7 @@ public class EntityHippogryph extends EntityTameable implements IAnimatedEntity,
 				}
 				return true;
 			}
-			if (itemstack != null && itemstack.getItem() instanceof ItemFood && ((ItemFood) itemstack.getItem()).isWolfsFavoriteMeat()) {
+			if (itemstack != null && itemstack.getItem() instanceof ItemFood && ((ItemFood) itemstack.getItem()).isWolfsFavoriteMeat() && this.getHealth() < this.getMaxHealth()) {
 				this.heal(5);
 				this.playSound(SoundEvents.ENTITY_GENERIC_EAT, 1, 1);
 				for (int i = 0; i < 3; i++) {
@@ -534,6 +538,10 @@ public class EntityHippogryph extends EntityTameable implements IAnimatedEntity,
 	}
 
 	public boolean canMove() {
+		StoneEntityProperties properties = EntityPropertiesHandler.INSTANCE.getProperties(this, StoneEntityProperties.class);
+		if(properties != null && properties.isStone){
+			return false;
+		}
 		return !this.isSitting() && this.getControllingPassenger() == null && sitProgress == 0;
 	}
 
@@ -1089,5 +1097,16 @@ public class EntityHippogryph extends EntityTameable implements IAnimatedEntity,
 	@Override
 	public boolean shouldAnimalsFear(Entity entity) {
 		return DragonUtils.canTameDragonAttack(this, entity);
+	}
+
+	public void dropArmor(){
+		if (hippogryphInventory != null && !this.world.isRemote) {
+			for (int i = 0; i < hippogryphInventory.getSizeInventory(); ++i) {
+				ItemStack itemstack = hippogryphInventory.getStackInSlot(i);
+				if (!itemstack.isEmpty()) {
+					this.entityDropItem(itemstack, 0.0F);
+				}
+			}
+		}
 	}
 }

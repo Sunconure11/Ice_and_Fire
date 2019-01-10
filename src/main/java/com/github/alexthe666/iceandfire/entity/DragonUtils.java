@@ -72,12 +72,12 @@ public class DragonUtils {
 	public static EntityLivingBase riderLookingAtEntity(EntityLivingBase dragon, EntityLivingBase rider, double dist) {
 		Vec3d vec3d = rider.getPositionEyes(1.0F);
 		Vec3d vec3d1 = rider.getLook(1.0F);
-		Vec3d vec3d2 = vec3d.addVector(vec3d1.x * dist, vec3d1.y * dist, vec3d1.z * dist);
+		Vec3d vec3d2 = vec3d.add(vec3d1.x * dist, vec3d1.y * dist, vec3d1.z * dist);
 		double d1 = dist;
 		Entity pointedEntity = null;
 		List<Entity> list = rider.world.getEntitiesInAABBexcluding(rider, rider.getEntityBoundingBox().expand(vec3d1.x * dist, vec3d1.y * dist, vec3d1.z * dist).grow(1.0D, 1.0D, 1.0D), Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>() {
 			public boolean apply(@Nullable Entity entity) {
-				return entity != null && entity.canBeCollidedWith() && entity instanceof EntityLivingBase && entity != dragon;
+				return entity != null && entity.canBeCollidedWith() && entity instanceof EntityLivingBase && !entity.isEntityEqual(dragon) && !entity.isOnSameTeam(dragon) &&  (!(entity instanceof IDeadMob) || !((IDeadMob) entity).isMobDead());
 			}
 		}));
 		double d2 = d1;
@@ -206,10 +206,7 @@ public class DragonUtils {
 			return false;
 		}
 		if(entity instanceof EntityTameable){
-			EntityTameable tameable = (EntityTameable)entity;
-			if(tameable.getOwnerId() != null && tameable.getOwnerId().equals(dragon.getOwnerId())){
-				return false;
-			}
+			return !((EntityTameable) entity).isTamed();
 		}
 		return true;
 	}

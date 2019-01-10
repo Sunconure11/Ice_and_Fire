@@ -1,6 +1,7 @@
 package com.github.alexthe666.iceandfire.block;
 
 import com.github.alexthe666.iceandfire.IceAndFire;
+import com.github.alexthe666.iceandfire.entity.EntityIceDragon;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -26,7 +27,7 @@ public class BlockIceSpikes extends Block {
 	public BlockIceSpikes() {
 		super(Material.PACKED_ICE);
 		this.setHardness(2.5F);
-		this.setUnlocalizedName("iceandfire.dragon_ice_spikes");
+		this.setTranslationKey("iceandfire.dragon_ice_spikes");
 		this.setCreativeTab(IceAndFire.TAB);
 		this.setSoundType(SoundType.GLASS);
 		this.setHarvestLevel("pickaxe", 1);
@@ -34,9 +35,11 @@ public class BlockIceSpikes extends Block {
 	}
 
 	public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn) {
-		entityIn.attackEntityFrom(DamageSource.CACTUS, 1);
-		if (entityIn instanceof EntityLivingBase && entityIn.motionX != 0 && entityIn.motionZ != 0) {
-			((EntityLivingBase) entityIn).knockBack(entityIn, 0.5F, entityIn.motionX, entityIn.motionZ);
+		if(!(entityIn instanceof EntityIceDragon)){
+			entityIn.attackEntityFrom(DamageSource.CACTUS, 1);
+			if (entityIn instanceof EntityLivingBase && entityIn.motionX != 0 && entityIn.motionZ != 0) {
+				((EntityLivingBase) entityIn).knockBack(entityIn, 0.5F, entityIn.motionX, entityIn.motionZ);
+			}
 		}
 	}
 

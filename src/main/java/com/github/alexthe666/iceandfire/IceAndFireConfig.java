@@ -29,6 +29,7 @@ public class IceAndFireConfig {
 	public int oreToStoneRatioForDragonCaves = 45;
 	public int dragonEggTime = 7200;
 	public int dragonGriefing = 0;
+	public boolean tamedDragonGriefing = true;
 	public int dragonFlapNoiseDistance = 4;
 	public int dragonFluteDistance = 8;
 	public int dragonHealth = 500;
@@ -37,6 +38,9 @@ public class IceAndFireConfig {
 	public int dragonGoldSearchLength = 17;
 	public boolean canDragonsDespawn = true;
 	public boolean dragonDigWhenStuck = true;
+	public boolean dragonDropSkull = true;
+	public boolean dragonDropHeart = true;
+	public boolean dragonDropBlood = true;
 	public int dragonTargetSearchLength = 64;
 	public int dragonWanderFromHomeDistance = 40;
 	public int dragonHungerTickRate = 3000;
@@ -78,17 +82,23 @@ public class IceAndFireConfig {
 	public int stymphalianBirdFlockLength = 40;
 	public int stymphalianBirdFlightHeight = 80;
 	public boolean spawnStymphalianBirds = true;
+	public boolean stymphalianBirdsOreDictDrops = true;
 	public boolean stympahlianBirdAttackAnimals = false;
 	public int stymphalianBirdSpawnChance = 100;
 	public boolean spawnTrolls = true;
 	public int trollSpawnRate = 20;
 	public int trollSpawnCheckChance = 1;
+	public boolean trollsDropWeapon = true;
 	public double trollMaxHealth = 50;
 	public double trollAttackStrength = 10;
 	public boolean villagersFearDragons = true;
 	public boolean animalsFearDragons = true;
+	public int myrmexPregnantTicks = 2500;
+	public int myrmexEggTicks = 3000;
+	public int myrmexLarvaTicks = 35000;
+	public int myrmexColonyGenChance = 150;
 
-    public void init(Configuration config) {
+	public void init(Configuration config) {
 		this.customMainMenu = config.getBoolean("Custom main menu", "all", true, "Whether to display the dragon on the main menu or not");
 		this.useVanillaFont = config.getBoolean("Use Vanilla Font", "all", false, "Whether to use the vanilla font in the bestiary or not");
 		this.generateSilverOre  = config.getBoolean("Generate Silver Ore", "all", true, "Whether to generate silver ore or not");
@@ -112,10 +122,11 @@ public class IceAndFireConfig {
 		this.spawnGlaciers = config.getBoolean("Generate Glaciers", "all", true, "Whether to generate glacier biomes or not");
 		this.glacierSpawnChance = config.getInt("Glacier Spawn Weight", "all", 4, 1, 10000, "Glacier Spawn Weight. Higher number = more common");
 		this.oreToStoneRatioForDragonCaves = config.getInt("Dragon Cave Ore Ratio", "all", 45, 1, 10000, "Ratio of Stone(this number) to Ores in Dragon Caves");
-		this.dangerousWorldGenDistanceLimit = config.getInt("Dangerous World Gen Distance From Spawn", "all", 200, 1, Integer.MAX_VALUE, "How many blocks away does dangerous(dragons, cyclops, etc.) world gen have to generate from spawn");
+		this.dangerousWorldGenDistanceLimit = config.getInt("Dangerous World Gen Distance From Spawn", "all", 200, 0, Integer.MAX_VALUE, "How many blocks away does dangerous(dragons, cyclops, etc.) world gen have to generate from spawn");
 
 		this.dragonEggTime = config.getInt("Dragon Egg Hatch Time", "all", 7200, 1, Integer.MAX_VALUE, "How long it takes(in ticks) for a dragon egg to hatch");
 		this.dragonGriefing = config.getInt("Dragon Griefing", "all", 0, 0, 2, "Dragon griefing - 2 is no griefing, 1 is breaking weak blocks, 0 is default");
+		this.tamedDragonGriefing = config.getBoolean("Tamed Dragon Griefing", "all", true, "True if tamed dragons can follow the griefing rules.");
 		this.dragonFlapNoiseDistance = config.getInt("Dragon Flap Noise Distance", "all", 4, 0, 10000, "Dragon Flap Noise Distance - Larger number, further away you can hear it");
 		this.dragonFluteDistance = config.getInt("Dragon Flute Distance", "all", 4, 0, 10000, "Dragon Flute Distance - how many chunks away is the dragon flute effective?");
 		this.dragonHealth = config.getInt("Dragon Health", "all", 500, 1, 100000, "Max dragon health. Health is scaled to this");
@@ -124,6 +135,9 @@ public class IceAndFireConfig {
 		this.dragonGoldSearchLength = config.getInt("Dragon Gold Search Length", "all", 17, 0, 10000, "How far away dragons will detect gold blocks being destroyed or chests being opened");
 		this.canDragonsDespawn = config.getBoolean("Dragons Despawn", "all", true, "True if dragons can despawn. Note that if this is false there may be SERIOUS lag issues.");
 		this.dragonDigWhenStuck = config.getBoolean("Dragons Dig When Stuck", "all", true, "True if dragons can break blocks if they get stuck. Turn this off if your dragons randomly explode.");
+		this.dragonDropSkull = config.getBoolean("Dragons Drop Skull", "all", true, "True if dragons can drop their skull on death.");
+		this.dragonDropHeart = config.getBoolean("Dragons Drop Heart", "all", true, "True if dragons can drop their heart on death.");
+		this.dragonDropBlood = config.getBoolean("Dragons Drop Blood", "all", true, "True if dragons can drop their blood on death.");
 		this.dragonTargetSearchLength = config.getInt("Dragon Target Search Length", "all", 64, 1, 10000, "How many blocks away can dragons spot potential prey. Note that increasing this could cause lag.");
 		this.dragonWanderFromHomeDistance = config.getInt("Dragon Wander From Home Distance", "all", 40, 1, 10000, "How many blocks away can dragons wander from their defined \"home\" position.");
 		this.dragonHungerTickRate = config.getInt("Dragon Hunger Tick Rate", "all", 3000, 1, 10000, "Every interval of this number in ticks, dragon hunger decreases.");
@@ -175,13 +189,21 @@ public class IceAndFireConfig {
 		this.stymphalianBirdFlockLength = config.getInt("Stymphalian Bird Flock Length", "all", 40, 1, 10000, "How far away stymphalian birds will consider other birds to be in the same flock.");
 		this.stymphalianBirdFlightHeight = config.getInt("Max Stymphalian Bird Flight Height", "all", 80, 10, 1000, "How high stymphalian birds can fly, in Y height.");
 		this.spawnStymphalianBirds = config.getBoolean("Spawn Stymphalian Birds", "all", true, "True if stymphalian birds are allowed to spawn");
+		this.stymphalianBirdsOreDictDrops = config.getBoolean("Stymphalian Birds drop ore dict items", "all", true, "True if stymphalian birds can drop items registered in the ore dictionary to ingotCopper, ingotBronze, nuggetCopper, nuggetBronze.");
 		this.stympahlianBirdAttackAnimals = config.getBoolean("Stymphalian Birds Target Animals", "all", false, "True if stymphalian birds are allowed to target and attack animals");
 		this.stymphalianBirdSpawnChance = config.getInt("Spawn Stymhphalian Bird Chance", "all", 100, 1, 10000, "1 out of this number chance per chunk for generation");
 
 		this.spawnTrolls = config.getBoolean("Spawn Trolls", "all", true, "True if trolls are allowed to spawn");
+		this.trollsDropWeapon = config.getBoolean("Trolls Drop Weapon", "all", true, "True if trolls are allowed to drop their weapon on death.");
 		this.trollSpawnRate = config.getInt("Troll Spawn Weight", "all", 500, 1, 10000, "Troll spawn weight. Lower = lower chance to spawn");
 		this.trollSpawnCheckChance = config.getInt("Troll Spawn Check Chance", "all", 1, 0, 10000, "A double check to see if the game can spawn trolls. Higher number = lower chance to spawn.");
 		this.trollMaxHealth = (double)config.getFloat("Troll Max Health", "all", 50, 1, 10000, "Maximum troll health");
 		this.trollAttackStrength = (double)config.getFloat("Troll Attack Strength", "all", 10, 1, 10000, "Troll attack strength");
+
+		this.myrmexPregnantTicks = config.getInt("Myrmex Gestation Length", "all", 2500, 1, 10000, "How many ticks it takes for a Myrmex Queen to produce an egg.");
+		this.myrmexEggTicks = config.getInt("Myrmex Hatch Length", "all", 3000, 1, 10000, "How many ticks it takes for a Myrmex Egg to hatch.");
+		this.myrmexLarvaTicks = config.getInt("Myrmex Hatch Length", "all", 35000, 1, 10000, "How many ticks it takes for a Myrmex to move from a larva to a pupa, and from a pupa to an adult.");
+		this.myrmexColonyGenChance = config.getInt("Myrmex Colony Gen Chance", "all", 150, 1, 10000, "One out of this number chance per chunk to generate a myrmex hive.");
+
 	}
 }

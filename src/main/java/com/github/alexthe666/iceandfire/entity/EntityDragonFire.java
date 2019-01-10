@@ -82,17 +82,16 @@ public class EntityDragonFire extends EntityFireball implements IDragonProjectil
 				}
 				this.setDead();
 			}
-			if (movingObject.entityHit != null && !(movingObject.entityHit instanceof IDragonProjectile) && movingObject.entityHit != shootingEntity) {
-				if (this.shootingEntity != null && (movingObject.entityHit == this.shootingEntity || (this.shootingEntity instanceof EntityDragonBase & movingObject.entityHit instanceof EntityTameable && ((EntityDragonBase) shootingEntity).getOwner() == ((EntityTameable) movingObject.entityHit).getOwner()))) {
+			if (movingObject.entityHit != null && !(movingObject.entityHit instanceof IDragonProjectile) && !movingObject.entityHit.isEntityEqual(shootingEntity)) {
+				if (this.shootingEntity != null && (movingObject.entityHit.isEntityEqual(shootingEntity) || (this.shootingEntity instanceof EntityDragonBase & movingObject.entityHit instanceof EntityTameable && ((EntityDragonBase) shootingEntity).getOwner() == ((EntityTameable) movingObject.entityHit).getOwner()))) {
 					return;
 				}
-				if (this.shootingEntity != null) {
+				if (this.shootingEntity != null && this.shootingEntity instanceof EntityDragonBase) {
 					if (movingObject.entityHit instanceof EntityLivingBase && ((EntityLivingBase) movingObject.entityHit).getHealth() == 0) {
 						((EntityDragonBase) this.shootingEntity).attackDecision = true;
 					}
 				}
 				this.applyEnchantments(this.shootingEntity, movingObject.entityHit);
-				movingObject.entityHit.setFire(3);
 				//if (movingObject.entityHit.isDead && movingObject.entityHit instanceof EntityPlayer) {
 				//	((EntityPlayer) movingObject.entityHit).addStat(ModAchievements.dragonKill, 1);
 				//}

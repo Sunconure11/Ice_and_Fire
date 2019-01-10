@@ -22,13 +22,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ItemDragonSkull extends Item {
+public class ItemDragonSkull extends Item implements ICustomRendered {
 
 	public ItemDragonSkull() {
 		this.maxStackSize = 1;
 		this.setHasSubtypes(true);
 		this.setCreativeTab(IceAndFire.TAB);
-		this.setUnlocalizedName("iceandfire.dragon_skull");
+		this.setTranslationKey("iceandfire.dragon_skull");
 		this.setRegistryName(IceAndFire.MODID, "dragon_skull");
 	}
 

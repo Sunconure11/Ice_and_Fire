@@ -2,6 +2,7 @@ package com.github.alexthe666.iceandfire.block;
 
 import com.github.alexthe666.iceandfire.IceAndFire;
 import com.github.alexthe666.iceandfire.entity.EntityMyrmexBase;
+import com.github.alexthe666.iceandfire.item.ICustomRendered;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -24,7 +25,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
-public class BlockMyrmexResin extends Block {
+public class BlockMyrmexResin extends Block implements ICustomRendered {
 
     private boolean sticky;
     protected static final AxisAlignedBB STICKY_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.875D, 1.0D);
@@ -34,14 +35,15 @@ public class BlockMyrmexResin extends Block {
         super(Material.CLAY);
         this.setDefaultState(this.blockState.getBaseState().withProperty(VARIANT, EnumType.DESERT));
         this.setHardness(2.5F);
-        this.setUnlocalizedName(sticky ? "iceandfire.myrmex_resin_sticky" : "iceandfire.myrmex_resin");
+        this.setTranslationKey(sticky ? "iceandfire.myrmex_resin_sticky" : "iceandfire.myrmex_resin");
         this.setCreativeTab(IceAndFire.TAB);
         this.setSoundType(sticky ? SoundType.SLIME : SoundType.GROUND);
         this.setRegistryName(IceAndFire.MODID, sticky ? "myrmex_resin_sticky" : "myrmex_resin");
-        if(sticky){
-            this.slipperiness = 0.8F;
-        }
         this.sticky = sticky;
+    }
+
+    public float getSlipperiness(IBlockState state, IBlockAccess world, BlockPos pos, @Nullable Entity entity) {
+        return entity != null && entity instanceof EntityMyrmexBase ? slipperiness : 0.75F;
     }
 
     @Override
@@ -85,9 +87,16 @@ public class BlockMyrmexResin extends Block {
 
 
     public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
-        if(sticky && !(entityIn instanceof EntityMyrmexBase)) {
-            entityIn.motionX *= 0.4D;
-            entityIn.motionZ *= 0.4D;
+        if(sticky) {
+            if((entityIn instanceof EntityMyrmexBase)){
+                entityIn.motionX *= 1.2D;
+                entityIn.motionY *= 1.2D;
+                entityIn.motionZ *= 1.2D;
+            }else{
+                entityIn.motionX *= 0.4D;
+                entityIn.motionZ *= 0.4D;
+            }
+
         }
     }
 

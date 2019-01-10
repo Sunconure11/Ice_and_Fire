@@ -91,7 +91,7 @@ public class IceExplosion extends Explosion {
 								f -= (f2 + 0.3F) * 0.3F;
 							}
 
-							if (f > 0.0F && (this.exploder == null || this.exploder.canExplosionDestroyBlock(this, this.worldObj, blockpos, iblockstate, f))) {
+							if (f > 0.0F && (this.exploder == null || this.exploder.canExplosionDestroyBlock(this, this.worldObj, blockpos, iblockstate, f)) && iblockstate.getBlock().canEntityDestroy(iblockstate, this.worldObj, blockpos, this.exploder)) {
 								set.add(blockpos);
 							}
 
@@ -117,8 +117,8 @@ public class IceExplosion extends Explosion {
 		Vec3d Vec3d = new Vec3d(this.explosionX, this.explosionY, this.explosionZ);
 
 		for (Entity entity : list) {
-			if (!(entity instanceof EntityDragonFire)) {
-				if (!entity.isImmuneToExplosions()) {
+			if (!(entity instanceof EntityDragonIceProjectile)) {
+				if (!entity.isImmuneToExplosions() && !entity.isEntityEqual(exploder)) {
 					double d12 = entity.getDistance(this.explosionX, this.explosionY, this.explosionZ) / f3;
 
 					if (d12 <= 1.0D) {
@@ -143,11 +143,13 @@ public class IceExplosion extends Explosion {
 										//((EntityPlayer) entity).addStat(ModAchievements.dragonSlayer, 1);
 									}
 								} else {
-									entity.attackEntityFrom(IceAndFire.dragonIce, (float) ((int) ((d10 * d10 + d10) / 2.0D * 7.0D * (double) f3 + 1.0D)) / 3);
-									if (entity instanceof EntityLivingBase) {
-										FrozenEntityProperties frozenProps = EntityPropertiesHandler.INSTANCE.getProperties(entity, FrozenEntityProperties.class);
-										if(frozenProps != null) {
-											frozenProps.setFrozenFor(200);
+									if(!entity.isEntityEqual(exploder)) {
+										entity.attackEntityFrom(IceAndFire.dragonIce, (float) ((int) ((d10 * d10 + d10) / 2.0D * 7.0D * (double) f3 + 1.0D)) / 3);
+										if (entity instanceof EntityLivingBase) {
+											FrozenEntityProperties frozenProps = EntityPropertiesHandler.INSTANCE.getProperties(entity, FrozenEntityProperties.class);
+											if (frozenProps != null) {
+												frozenProps.setFrozenFor(200);
+											}
 										}
 									}
 								}
@@ -204,7 +206,7 @@ public class IceExplosion extends Explosion {
 					this.worldObj.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0, d1, d2, d3, d4, d5, new int[0]);
 					this.worldObj.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0, d1, d2, d3, d4, d5, new int[0]);
 				}
-				if (state.getMaterial() != Material.AIR && !state.getBlock().getUnlocalizedName().contains("grave") && DragonUtils.canDragonBreak(state.getBlock()) && mobGreifing) {
+				if (state.getMaterial() != Material.AIR && !state.getBlock().getTranslationKey().contains("grave") && DragonUtils.canDragonBreak(state.getBlock()) && mobGreifing) {
 					if (block == Blocks.GRASS_PATH) {
 						worldObj.setBlockState(blockpos, ModBlocks.frozenGrassPath.getDefaultState());
 					}

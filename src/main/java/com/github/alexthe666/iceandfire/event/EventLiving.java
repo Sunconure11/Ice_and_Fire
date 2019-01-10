@@ -14,9 +14,7 @@ import net.minecraft.block.BlockChest;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityWitherSkeleton;
-import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -57,6 +55,16 @@ public class EventLiving {
 
 	private boolean stepHeightSwitched = false;
 
+	@SubscribeEvent
+	public void onEntityFall(LivingFallEvent event) {
+		if(event.getEntityLiving() instanceof EntityPlayer){
+			MiscPlayerProperties properties = EntityPropertiesHandler.INSTANCE.getProperties(event.getEntityLiving(), MiscPlayerProperties.class);
+			if(properties.hasDismountedDragon){
+				event.setDamageMultiplier(0);
+				properties.hasDismountedDragon = false;
+			}
+		}
+	}
 	@SubscribeEvent
 	public void onEntityMount(EntityMountEvent event) {
 		if(event.getEntityBeingMounted() instanceof EntityDragonBase){
@@ -244,7 +252,6 @@ public class EventLiving {
 	@SubscribeEvent
 	public void onEntityUseItem(PlayerInteractEvent.RightClickItem event){
 		if(event.getEntityLiving() instanceof EntityPlayer && event.getEntityLiving().rotationPitch > 87 && event.getEntityLiving().getRidingEntity() != null && event.getEntityLiving().getRidingEntity() instanceof EntityDragonBase){
-			System.out.println(event.getEntityLiving().world.isRemote);
 			((EntityDragonBase) event.getEntityLiving().getRidingEntity()).processInteract((EntityPlayer)event.getEntityLiving(), event.getHand());
 		}
 	}
@@ -308,12 +315,13 @@ public class EventLiving {
 
 		if (event.getEntityLiving() instanceof EntityPlayer || event.getEntityLiving() instanceof EntityVillager || event.getEntityLiving() instanceof IHearsSiren) {
 			SirenEntityProperties sirenProps = EntityPropertiesHandler.INSTANCE.getProperties(event.getEntityLiving(), SirenEntityProperties.class);
-			if (sirenProps != null) {
-				EntitySiren closestSiren = sirenProps.getClosestSiren(event.getEntityLiving().world, event.getEntityLiving());
+			if (sirenProps != null && sirenProps.sirenID != 0) {
+				EntitySiren closestSiren = sirenProps.getSiren(event.getEntityLiving().world);
 				if (closestSiren != null && closestSiren.isActuallySinging()) {
 					stepHeightSwitched = false;
 					if (EntitySiren.isWearingEarplugs(event.getEntityLiving())) {
 						sirenProps.isCharmed = false;
+						sirenProps.sirenID = 0;
 					} else {
 						sirenProps.isCharmed = true;
 						if (rand.nextInt(7) == 0) {
@@ -356,13 +364,15 @@ public class EventLiving {
 						entity.rotationYaw = updateRotation(entity.rotationYaw, f, 30F);
 						if (entity.getDistance(closestSiren) < 5D) {
 							sirenProps.isCharmed = false;
+							sirenProps.sirenID = 0;
 							closestSiren.setSinging(false);
 							closestSiren.setAttackTarget((EntityLivingBase) entity);
 							closestSiren.setAggressive(true);
 							closestSiren.triggerOtherSirens((EntityLivingBase) entity);
 						}
-						if (closestSiren.isDead || entity.getDistance(closestSiren) > EntitySiren.SEARCH_RANGE * 2 || sirenProps.getClosestSiren(event.getEntityLiving().world, event.getEntityLiving()) == null || entity instanceof EntityPlayer && ((EntityPlayer) entity).isCreative()) {
+						if (closestSiren.isDead || entity.getDistance(closestSiren) > EntitySiren.SEARCH_RANGE * 2 || sirenProps.getSiren(event.getEntityLiving().world) == null || entity instanceof EntityPlayer && ((EntityPlayer) entity).isCreative()) {
 							sirenProps.isCharmed = false;
+							sirenProps.sirenID = 0;
 						}
 					}
 				} else if (!sirenProps.isCharmed && !stepHeightSwitched) {
@@ -544,7 +554,7 @@ public class EventLiving {
 
 	public static boolean isAnimaniaFerret(Entity entity){
 		String className = entity.getClass().getName();
-		return className.contains("ferret");
+		return className.contains("ferret") || className.contains("polecat");
 	}
 
 	//@SubscribeEvent

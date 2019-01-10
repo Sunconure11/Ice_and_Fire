@@ -12,7 +12,6 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
-import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -29,11 +28,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
-public class ItemGorgonHead extends Item {
+public class ItemGorgonHead extends Item implements ICustomRendered {
 
 	public ItemGorgonHead() {
 		this.setCreativeTab(IceAndFire.TAB);
-		this.setUnlocalizedName("iceandfire.gorgon_head");
+		this.setTranslationKey("iceandfire.gorgon_head");
 		this.maxStackSize = 1;
 		this.setRegistryName(IceAndFire.MODID, "gorgon_head");
 	}
@@ -59,7 +58,7 @@ public class ItemGorgonHead extends Item {
 		double dist = 32;
 		Vec3d vec3d = entity.getPositionEyes(1.0F);
 		Vec3d vec3d1 = entity.getLook(1.0F);
-		Vec3d vec3d2 = vec3d.addVector(vec3d1.x * dist, vec3d1.y * dist, vec3d1.z * dist);
+		Vec3d vec3d2 = vec3d.add(vec3d1.x * dist, vec3d1.y * dist, vec3d1.z * dist);
 		double d1 = dist;
 		Entity pointedEntity = null;
 		List<Entity> list = worldIn.getEntitiesInAABBexcluding(entity, entity.getEntityBoundingBox().expand(vec3d1.x * dist, vec3d1.y * dist, vec3d1.z * dist).grow(1.0D, 1.0D, 1.0D), Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>() {
@@ -105,11 +104,7 @@ public class ItemGorgonHead extends Item {
 					if (!worldIn.isRemote) {
 						worldIn.spawnEntity(statue);
 					}
-					for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
-						statue.setItemStackToSlot(slot, ((EntityLivingBase) pointedEntity).getItemStackFromSlot(slot));
-					}
 				} else {
-
 					StoneEntityProperties properties = EntityPropertiesHandler.INSTANCE.getProperties(pointedEntity, StoneEntityProperties.class);
 					if (properties != null) {
 						properties.isStone = true;
@@ -126,6 +121,9 @@ public class ItemGorgonHead extends Item {
 						dragon.setFlying(false);
 						dragon.setHovering(false);
 						dragon.airTarget = null;
+					}
+					if(pointedEntity instanceof IDropArmor){
+						((IDropArmor) pointedEntity).dropArmor();
 					}
 				}
 

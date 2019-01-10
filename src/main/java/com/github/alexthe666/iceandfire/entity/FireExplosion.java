@@ -90,7 +90,7 @@ public class FireExplosion extends Explosion {
 								f -= (f2 + 0.3F) * 0.3F;
 							}
 
-							if (f > 0.0F && (this.exploder == null || this.exploder.canExplosionDestroyBlock(this, this.worldObj, blockpos, iblockstate, f))) {
+							if (f > 0.0F && (this.exploder == null || this.exploder.canExplosionDestroyBlock(this, this.worldObj, blockpos, iblockstate, f)) && iblockstate.getBlock().canEntityDestroy(iblockstate, this.worldObj, blockpos, this.exploder)) {
 								set.add(blockpos);
 							}
 
@@ -117,7 +117,7 @@ public class FireExplosion extends Explosion {
 
 		for (Entity entity : list) {
 			if (!(entity instanceof EntityDragonFire)) {
-				if (!entity.isImmuneToExplosions()) {
+				if (!entity.isImmuneToExplosions() && !entity.isEntityEqual(exploder)) {
 					double d12 = entity.getDistance(this.explosionX, this.explosionY, this.explosionZ) / f3;
 
 					if (d12 <= 1.0D) {
@@ -140,7 +140,7 @@ public class FireExplosion extends Explosion {
 									if (entity.isDead && entity instanceof EntityPlayer) {
 										//((EntityPlayer) entity).addStat(ModAchievements.dragonSlayer, 1);
 									}
-								} else {
+								} else if(!entity.isEntityEqual(exploder)){
 									entity.attackEntityFrom(IceAndFire.dragonFire, (float) ((int) ((d10 * d10 + d10) / 2.0D * 7.0D * (double) f3 + 1.0D)) / 3);
 									//if (entity.isDead && entity instanceof EntityPlayer) {
 									//	((EntityPlayer) entity).addStat(ModAchievements.dragonSlayer, 1);
@@ -199,7 +199,7 @@ public class FireExplosion extends Explosion {
 					this.worldObj.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0, d1, d2, d3, d4, d5, new int[0]);
 				}
 
-				if (state.getMaterial() != Material.AIR && !state.getBlock().getUnlocalizedName().contains("grave") && DragonUtils.canDragonBreak(state.getBlock()) && mobGreifing) {
+				if (state.getMaterial() != Material.AIR && !state.getBlock().getTranslationKey().contains("grave") && DragonUtils.canDragonBreak(state.getBlock()) && mobGreifing) {
 					if (block == Blocks.GRASS_PATH) {
 						worldObj.setBlockState(blockpos, ModBlocks.charedGrassPath.getDefaultState());
 					}

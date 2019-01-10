@@ -153,9 +153,21 @@ public class EntityPixie extends EntityTameable {
 	}
 
 	public boolean processInteract(EntityPlayer player, EnumHand hand) {
-		if (this.isOwner(player)) {
-			this.setSitting(!this.isSitting());
+		boolean flag = player.getHeldItem(hand).getItem() == Items.NAME_TAG || player.getHeldItem(hand).getItem() == Items.LEAD;
+		if (flag) {
+			player.getHeldItem(hand).interactWithEntity(player, this, hand);
 			return true;
+		}
+		if (this.isOwner(player)) {
+			if(player.getHeldItem(hand).getItem() == Items.SUGAR){
+				this.heal(5);
+				player.getHeldItem(hand).shrink(1);
+				this.playSound(ModSounds.PIXIE_TAUNT, 1F, 1F);
+				return true;
+			}else{
+				this.setSitting(!this.isSitting());
+				return true;
+			}
 		} else if (player.getHeldItem(hand).getItem() == Item.getItemFromBlock(ModBlocks.jar_empty) && player.getHeldItem(hand).getMetadata() == 0 && !this.isTamed()) {
 			if (!player.isCreative()) {
 				player.getHeldItem(hand).shrink(1);
@@ -169,11 +181,6 @@ public class EntityPixie extends EntityTameable {
 			}
 			//player.addStat(ModAchievements.jarPixie);
 			this.setDead();
-		}else if(player.getHeldItem(hand).getItem() == Items.SUGAR){
-			this.heal(5);
-			player.getHeldItem(hand).shrink(1);
-			this.playSound(ModSounds.PIXIE_TAUNT, 1F, 1F);
-			return true;
 		}
 		return super.processInteract(player, hand);
 	}

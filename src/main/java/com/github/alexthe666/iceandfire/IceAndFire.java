@@ -6,6 +6,7 @@ import com.github.alexthe666.iceandfire.core.ModVillagers;
 import com.github.alexthe666.iceandfire.event.EventLiving;
 import com.github.alexthe666.iceandfire.event.StructureGenerator;
 import com.github.alexthe666.iceandfire.integration.ThaumcraftCompatBridge;
+import com.github.alexthe666.iceandfire.loot.CustomizeToDragon;
 import com.github.alexthe666.iceandfire.message.*;
 import com.github.alexthe666.iceandfire.misc.CreativeTab;
 import com.github.alexthe666.iceandfire.world.village.ComponentAnimalFarm;
@@ -21,6 +22,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
+import net.minecraft.world.storage.loot.functions.LootFunctionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Loader;
@@ -45,13 +47,13 @@ import java.util.Random;
 public class IceAndFire {
 
     public static final String MODID = "iceandfire";
-    public static final String VERSION = "1.5.2";
+    public static final String VERSION = "1.6.0";
     public static final String LLIBRARY_VERSION = "1.7.9";
     public static final String NAME = "Ice And Fire";
     public static final Logger logger = LogManager.getLogger(NAME);
     @Instance(value = MODID)
     public static IceAndFire INSTANCE;
-    @NetworkWrapper({MessageDaytime.class, MessageDragonArmor.class, MessageDragonControl.class, MessageHippogryphArmor.class, MessageStoneStatue.class, MessageUpdatePixieHouse.class, MessageUpdatePixieHouseModel.class, MessageUpdatePixieJar.class, MessageSirenSong.class, MessageDeathWormHitbox.class, MessageDeathWormInteract.class})
+    @NetworkWrapper({MessageDaytime.class, MessageDragonArmor.class, MessageDragonControl.class, MessageHippogryphArmor.class, MessageStoneStatue.class, MessageUpdatePixieHouse.class, MessageUpdatePodium.class, MessageUpdatePixieHouseModel.class, MessageUpdatePixieJar.class, MessageSirenSong.class, MessageDeathWormHitbox.class, MessageMultipartInteract.class, MessageGetMyrmexHive.class, MessageSetMyrmexHiveNull.class})
     public static SimpleNetworkWrapper NETWORK_WRAPPER;
     @SidedProxy(clientSide = "com.github.alexthe666.iceandfire.ClientProxy", serverSide = "com.github.alexthe666.iceandfire.CommonProxy")
     public static CommonProxy PROXY;
@@ -76,7 +78,9 @@ public class IceAndFire {
         logger.info("A raven flies from the north to the sea");
         logger.info("A dragon whispers her name in the east");
         ThaumcraftCompatBridge.loadThaumcraftCompat();
+        LootFunctionManager.registerFunction(new CustomizeToDragon.Serializer());
     }
+
 
     public static void loadConfig() {
         File configFile = new File(Loader.instance().getConfigDir(), "ice_and_fire.cfg");
@@ -141,7 +145,7 @@ public class IceAndFire {
                 String s1 = s + ".player_" + new Random().nextInt(2);
                 return new TextComponentString(entityLivingBaseIn.getDisplayName().getFormattedText() + " ").appendSibling(new TextComponentTranslation(s1, new Object[]{entityLivingBaseIn.getDisplayName()}));
             }
-        };
+        }.setDamageBypassesArmor();
     }
 
     @EventHandler
